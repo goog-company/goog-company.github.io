@@ -1,9 +1,189 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Goog Company</title>
-    </head>
-    <body>
-        <h1>Goog</h1>
-    </body>
+<head>
+    <title>Goog Company</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        #title {
+            font-size: clamp(4rem, 15vw, 10rem);
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -2px;
+            text-shadow: 0 0 40px rgba(255,255,255,0.08);
+            min-height: 1.2em;
+            display: flex;
+            align-items: center;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 0.08em;
+            height: 1em;
+            background: #fff;
+            margin-left: 4px;
+            animation: blink 0.7s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        #ascii-wrapper {
+            margin-top: 3rem;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            width: 100%;
+            max-width: 900px;
+            padding: 0 1rem;
+            overflow: hidden;
+        }
+
+        #ascii-wrapper.visible {
+            opacity: 1;
+        }
+
+        #ascii {
+            font-size: clamp(3px, 1vw, 7px);
+            line-height: 1.1;
+            color: #555;
+            white-space: pre;
+            overflow: hidden;
+            display: block;
+            font-family: 'Courier New', monospace;
+        }
+
+        #tagline {
+            margin-top: 2rem;
+            font-size: 1rem;
+            color: #444;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        #tagline.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="title"><span id="typed"></span><span class="cursor"></span></div>
+    <div id="tagline">the goog company</div>
+
+    <div id="ascii-wrapper">
+        <pre id="ascii"></pre>
+    </div>
+
+    <script>
+        const asciiArt = `?+<>i!!i>>><++__~~__+_+++_?-__?--_~~_])xcYJJLLLLLLLOZppbkkpwZOCnt]-i!ii>>!!ii<~<>><~~>>_?-[{}{)(|\\tffjjjjjjjjjjrrrrrrrjjft\\
+})(1[}{{){}[]][}[?__<>>!;,":II;;IlIIIi~}fncXYYJJCLL0wddkhkbdpwOYn(?<!iiilllll!<<<>Il!i~_++~~~~~_?[}1|tjjrrrrrrrrrrxrrrjtt/\\
+?--?????---?[[}[-+<iI:,^\`''''.  '^^,:Il?)\txczYUCL0ZpdbbkhkkbpwmXj[->>>>!;;:;;IIi!l!!!!!>><<>>i><~+~++-?][|(ffjrrxxxnnnrxx/
+-_-]]]]??]??---_+<!I:^'...  ... . .'^:;~{)|fxczUCQZwwqpdbbkkkkdpwCt{+>>!I,^^^^^"""""",",::;lli>>>><~<<>>>l;;;:;;;:;:I!i<_+~
+jf1][]]]]]??-__+~>il:\`''''\`^\`'..   ...'\`;?)(/xczULOOZmmwwwphhhhkbpmn|[+~il;,^^^^^",^'''..'"\`\`,;I!!i>>>><<~+__~-}~<>>>+]+_?--
+rrrrf{?]][]???_++>l,^\`,!I\`''''\`:;;:.  .."\`i(\\\\jcUCQOZZmZwwqphhhkbdqwYj)}?<i!;"^^^^"\`....  . .'''^\\"Ii~+++++__+__}1)_+_-?__+???-
+rrxrxrjj1]]]]?-_+<l:";!;'.'"\`..    ...'^<tjxvXQZqpdpppqqpbkhhkkbbwzt(}[]<<!:,^..   .....''...'"\`^:li<_-]}}}-_]{(/1]---_+<+~/
+nnunxxxrt({]----__>l\`"I,..'"\`^^"\`' .  .."\`~rccvCmqqppdddpppqbhhhhhhhbZu(1{}[?>\`......\`:IIxW~,,;^..^I~~+++_-]]?{{}{11]_?+~]xxxx
+cczzccuxt)[-+~~~+__+i:::"\`......   ...,]YUYZwwqpdbbkbkbkkkkhhhhahhhpv|1}[],... '"''.'..."\`,\`.\`iI'^i-[?-----??~__][?+(trrrrxxr
+XXXXzzcvr\\?~~>~+_--]}}?+i!^    ...'^^;i{YLOZwdbkdddkhhhhhhhhhhhhhhhkdY|}]?\`\`\`''^,,^''..''"\`'';!"l_\\/j/\\}]?]??-[/rxrrrxxxrrjj
+YXXXXzzzn\\?~i>~_-?]--?}1))\\|{<"'"\`,Ii+)cJQZmqpddddddbkhhkhhhhhhhhkkkhhkL([-",::"''..''.''...l!;_|\\(1{{111)(\\xzcuuxxxxxxrrjjf
+YYYYYYXXzn\\_<i>>i>?[]-_-)jruzcuuzLmppOJLQ0ZqdddpdbbbbkkkhhhhhhhhhhhhhakC[~+-?))~\`'..'.. ">]?]1(){???[{1)|/jvzvunnxxxxrjjjft
+XYXYYXXXzu|~~~~~??[{)|fjvJ0qaooohbkbqCUYJCLOwwpddbddbbkkhhhhhhhhhhhhkkkbCf|(\\{[[[?++++[[}}[[?_-_--+_?}1(|\\/jxnunxxxrrrjft/\\
+uuvvvvvuxj1?-?[}[)\\nzXYwbh*##*oahbdqOXXUJJLZmwwqpdpppppdddbkkkbbbbkkddpppZcunxf/())}{}??~~_-+_-____?[{()1|fjnuunxxxjjftt\\|)
+Xvxxrzurxrt]-?-_+_1(cJwpbhahhkkkppwOLYXYJJLOZZmwwqpppqpddbbbbbbbbbbbdbpqqppJcYJJzvvvzcnrf\\([????}{[}}|1[}|fxvczzcuuuxrjft|1
+jxnxjrrrrxrt1[[[{(|/uvJ0wppbbkbkpwZ0CXvXUJCQQOZZZwwwwwqppdbbbbbbddddddppho*####ohpqmOYnf/|)1))1)1{[111[[}\\tfjrrunnxrxnjt|)[
+nXXXYXzvXYYvr[??---}fuYQ0OZwpppqw0YvnxxrxrrxnvczUUUJCLQ0OZZwqpqqqqdpppdh*#MMMM#**ookqLYvj\\1}[]]\\)))) 1}[[)\\//|{{1)1{}]][]?-_
+zYUUuJCLQCJJUXun1]-[}\\xvzXYL0wqwmOUn/|({[[[1(||\\\\\\\/trrrxnvcczXYJLOZmZqpbo*###M##**oadm0X/|\\[][}{{]}{1){[1|\\}]?_++~<~~>!!!i!
+UY\\cuucuzXXzfcx)|jvvntnJOqpwwmZZOO0Cn/)?_-?][}}}}}[}{)(/tjrxxxnnnnX0QCwa#####*#***oahpZUj\\)}}[????[[}1{1(({+~~_-????-_+++++
+XXXXvzzYXYfcUC0UCYzcnrrcQO0QLCCLO00Uut\\(}-~iI;!----_-][11(){[[{|()xOh***#M#MM##*#W#hdwQJc|}?--+?{|()1)fvu/}<lIl!!iiii>>i>il
+UUfJLCCJuJJCCXCQLYj\\fcLLCJCCCJJJJUYut/\\()1}_~>i<_++~++_?]<i>~_1nQqkoo***#*#*oao*o***abZc/[_<ii_-?[11)|ffrnrttjcxf\\(111[-~>>
+jCJJJJXLLOOOOZmwqddpqO0CUcvunxrjjf//\\||((){}}->iii>>><<~~~+{rOpkkhhkkbkho##**M###MWM#h0nj|(}}]1--_-?[{{)jj]??-?_<i><<<?)1[_
+CCQCUCCCJJtLLQ0ZC000QYnuvvvunnnnxjjt\\||()111{}]+iii!!>>i<[fvUZmZqqqwwqpqZqpqpdhahho***bn+IIlii!lil~~?[)nzn|[?_~<<ii_}|/t({?
+vXzJYXYY|YYUJLvCJJUJUXXzvnxxjft//t\\\\|(())11{{}{1[_~>I!<[|fxccXXJOQQ0ObdkbhkkbbdkkkbdbbZntxYzj{+>!<+]1fUCYznt{[]-_<>iiii<+??
+XCCLLLuQQ0Q00CLLLCLYwwwdZYvxrjttt\\|())11{}}}}}[[[[[]<~]{}{))(\\\\fnvYYLQpppmOOmppdbkkddO)~|QL1~i~?}]1uLppmJXv/{[-_~<>><>>><+?
+LLLQvL0000Q(0OmwwwxZZOQLCXJ0LYnjft/\\\\())11{{{}[]-_>I;Il~?}{1)))(|\\\\/fjxcUUULQ0JQZ0ct(nU+I;[z}~?zQCLOmZOQJcf|/u\\->i!>~~<<~--
+LLrLLQ0OZUmmmOOOXCZZZZZZUZZZZOLYYcxjt/|({}[?--+~<<!;;;I!i<~-[1))\\////trxxnvzYYUcXwLumQ}1]}f0XYJQwppqwppCUut)]___]?(1?-_++++
+xCLQ0O0ccQ00OOOn00Q000QnnuzzcJuzvucuxxrf/\\|(1}}]?_>!lI;Ili_-?]}}{1|\\/tfjjjnxfrJrYJvnOmcvmJYLmpbkhhhhkdwLcnYX|?]??-_+_-|)]??
+Q0Q00L(O0OOO0LCOOZZZm\\OOOOZZLULCJYXzrnxxrrrjt/|()1}_~_~<_[{((|\\/\\/tffjjfjxxcUJvvvLvrJzvYZhbbkhhhhahhhkwUct1}x/v1fj]]][]][[1/
+XXXXcnvvccvc\\nnvzccz/vvcccXX)vnuxft|\\/rnxxrrrrrjfft//////tffjjf///tt\\|||t//rxuczJLOdqqpppqphahhaoaabdwLucf]--_-tX)}tf]}{11)
+LCJ1JUUUYYz)YXXXzzX}zvvunnt+/||\\|((_(\|fxxnxxxrrrrjrrjjfffff//\\\\\\///fffrccULL0wmwkkbppkhha***oaahbbpQYYvt/((n}]]}}tu\\[{t[?]
+/))/t|\\/((}(((((||?(|(|\\j(i)|\\||(?(((())tfxxxxxrjjjjjjjjjftt/\\|fjrxuXJUUZmqbqbkdha#W#*kkkkhhhkkkkdwLOQf(1{}}]?x))11|t}j1](
+)XXzccuu1jjft\\||(<|||||t|~((|((((1]))11{{{_)fxxxxxxrxrrrjjjjjffjjrccvzXY0CqpOZZdpwpdbhhkkkkkkbbbdqZmYunnL\\?+_+_-]}j)1|t(__-
+cczvnnr[nxf|1}[?<]??--]]+_?-]][}}i)11111{?[{{\\ xxxxnxxxxxrrjjxxxxxXuucJYUCCYCZQQ0QOqqpdbkkhhokahkkbpmQQvr|{nn)111{[--)|__)}>
+UJJJJC}Yzuf\\||(~((|||\\|)])())()(]}11{}{}{i}}{)/nnxxxxxxxxxrnnunczYzuzULLOZO0wqmqmwpbbdbkhaaaoahkbbpmZUfu\\\\[?\\n1}[-_>>~]1!~1
+CLLQLtJUcr\\|((+())))((\\ <(())))){i{[]]-++~i_++_]\\unxxxrxxxxxxvxnzXXXcuzUJLC0wwqqdbddbkkkkkkhkhaaahddLCu\\)f|tft1(/+_-iii>_-1>
+JCCnJCYzxj/\\{)|(((|((|~)))))111<}{{{{}}}+]][[}(xnnxxnxxxxjrxjxnxvvzYXYYUJQLLOmqqwwppddbhoohhaaaaakQQ0Ytr]}}}1|\\}(}?~+<>i!!+
+LL/QLCYzxf\\1{))))((((-111)1)11[?{}{}}}}}!][][1jnxxrjjjxnxxxrurrxuvvUUJUJJCQLQQ0Zmmwppddbkhoo**akbbbqYt((|t|-?+_--]t+~~_>iii
+0xO00QLUcvftjtttt/t/{///////|\\_}[[]??-?--][{rXXUUYzcvunuuvczzcczYYYYJJZ0OOmZO0mmmqppqppdbkkho**okpwCLvunncfxf({){[-)|[[[}}}
+B@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@B@@@@@@@@@@BB@@@@@@@B@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@B@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@%.        ^@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@^            j@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@\`      c>      mB@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@q      B@@@_#@B@B@@@@Bm<' "}MB@@@@@@@@q>. ^{#B@@@@@@B+ \`YBkOOOOZB@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@l     "@@@@@@@@@@@@@M          ^@@@@&          ^B@@@       .     B@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@      <@m       "@w             @@h            .@@_             B@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@      <%w       ^@      B@\\     /B      %@n     1@      @@I     B@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@l     '@M01     !B      @@8     'B      @@%     '@     \`B@/     @B@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@q      @BB'     0B      @@a     \`B      @@#     \`@      @BI     @@B@u1&B@@@@n{&BB@@@f1%B@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@B"              @@\`     }&      kB\`     -8.     p@}             @@      pB      dB      #@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@^            B@@@            >@B@            <@@@.      '     @b       q      IU      l@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@B8         \\B@@@@@c         B@@@@@C         %@@@@@B?.\`L@/     @B!     @B^     @B,     B@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@B@@@@@@@@@@@x'.  ZB@!     BB@@@@@BBB@B@@B@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.           W@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@}        uB@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@BB@@@@B@@BB@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`;
+
+        const word = "Goog";
+        let i = 0;
+        const typedEl = document.getElementById('typed');
+        const tagline = document.getElementById('tagline');
+        const asciiWrapper = document.getElementById('ascii-wrapper');
+        const asciiEl = document.getElementById('ascii');
+
+        function typeNext() {
+            if (i <= word.length) {
+                typedEl.textContent = word.slice(0, i);
+                i++;
+                const delay = i === 1 ? 400 : 120 + Math.random() * 80;
+                setTimeout(typeNext, delay);
+            } else {
+                setTimeout(() => {
+                    tagline.classList.add('visible');
+                    asciiEl.textContent = asciiArt;
+                    asciiWrapper.classList.add('visible');
+                }, 600);
+            }
+        }
+
+        setTimeout(typeNext, 800);
+    </script>
+</body>
 </html>
