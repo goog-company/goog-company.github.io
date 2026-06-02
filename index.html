@@ -60,13 +60,14 @@
         }
 
         #ascii {
-            font-size: clamp(3px, 1vw, 7px);
+            font-size: clamp(5px, 1.4vw, 11px);
             line-height: 1.1;
             color: #555;
             white-space: pre;
             overflow: hidden;
             display: block;
             font-family: 'Courier New', monospace;
+            margin: 0 auto;
         }
 
         #tagline {
@@ -82,12 +83,25 @@
         #tagline.visible {
             opacity: 1;
         }
+
+        #counter {
+            margin-top: 1.2rem;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        #counter.visible {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
 
     <div id="title"><span id="typed"></span><span class="cursor"></span></div>
     <div id="tagline">the goog company</div>
+    <div id="counter">
+        <img src="https://count.getloli.com/@goog-website?name=goog-website&theme=booru-lewd" alt="goog visits" />
+    </div>
 
     <div id="ascii-wrapper">
         <pre id="ascii"></pre>
@@ -119,6 +133,7 @@
             } else {
                 setTimeout(() => {
                     tagline.classList.add('visible');
+                    document.getElementById('counter').classList.add('visible');
                     showAscii();
                 }, 600);
             }
