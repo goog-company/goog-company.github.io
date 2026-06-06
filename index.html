@@ -483,33 +483,55 @@
     <script>
     /* ════════════════════════════════════════════════════
        CUSTOM CURSOR
-       Tries to load every common image extension from /cursor/
-       The first one that loads successfully becomes the cursor.
+       Reads optional cursor_file from config.json, then
+       falls back to trying common names + extensions.
        ════════════════════════════════════════════════════ */
     (function initCursor() {
-        const cursorEl   = document.getElementById('custom-cursor');
-        const cursorImg  = document.getElementById('cursor-img');
-        const extensions = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'svg', 'cur'];
+        const cursorEl  = document.getElementById('custom-cursor');
+        const cursorImg = document.getElementById('cursor-img');
 
-        function tryNext(idx) {
-            if (idx >= extensions.length) return; // none found, keep default
+        const exts   = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'svg', 'cur'];
+        const names  = ['cursor', 'Cursor', 'mouse', 'pointer'];
 
-            const ext = extensions[idx];
-            const img = new Image();
-            img.onload = () => {
-                // Found a valid cursor image
-                cursorImg.src = img.src;
-                document.body.style.cursor = 'none';
-                cursorEl.style.display = 'block';
-            };
-            img.onerror = () => tryNext(idx + 1);
-            img.src = `cursor/cursor.${ext}`;
+        // Build full candidate list: every name × every ext
+        const candidates = [];
+        names.forEach(n => exts.forEach(e => candidates.push(`cursor/${n}.${e}`)));
+
+        function tryPath(path) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload  = () => resolve(path);
+                img.onerror = () => reject();
+                img.src = path;
+            });
         }
 
-        tryNext(0);
+        function applyCursor(path) {
+            cursorImg.src = path;
+            document.body.style.cursor = 'none';
+            cursorEl.style.display = 'block';
+        }
 
-        // Follow mouse
-        document.addEventListener('mousemove', (e) => {
+        async function findCursor(overridePath) {
+            // If config gave us a specific filename, try that first
+            if (overridePath) {
+                try { return applyCursor(await tryPath(overridePath)); } catch(_) {}
+            }
+            // Otherwise scan all candidates
+            for (const c of candidates) {
+                try { return applyCursor(await tryPath(c)); } catch(_) {}
+            }
+            // Nothing found — keep default browser cursor
+        }
+
+        // config.json may specify cursor_file e.g. "cursor/myCursor.png"
+        fetch('config.json')
+            .then(r => r.ok ? r.json() : {})
+            .then(cfg => findCursor(cfg.cursor_file))
+            .catch(() => findCursor(null));
+
+        // Follow mouse precisely
+        document.addEventListener('mousemove', e => {
             cursorEl.style.left = e.clientX + 'px';
             cursorEl.style.top  = e.clientY + 'px';
         });
@@ -592,45 +614,58 @@
         playTrack(next);
     });
 
-    // Load track list from manifest (don't play yet — wait for splash click)
-    fetch('music/manifest.json')
-        .then(r => {
-            if (!r.ok) throw new Error('no manifest');
-            return r.json();
-        })
-        .then(list => {
-            tracks = list.filter(f => /\.mp3$/i.test(f));
-            if (tracks.length === 0) {
-                noMusicMsg.textContent = 'no .mp3 files in /music/';
-                return;
-            }
+    // Auto-detect mp3s via GitHub API — no manifest needed
+    // Reads repo/owner from the current page URL (works for github.io sites)
+    (function loadTracks() {
+        // Extract "owner" and "repo" from the github.io hostname + path
+        // e.g. goog-company.github.io → owner=goog-company, repo=goog-company.github.io
+        const host  = location.hostname; // e.g. "goog-company.github.io"
+        const parts = host.split('.');
+        const owner = parts[0];
+        const repo  = host; // github.io repo name matches the full hostname
 
-            noMusicMsg.style.display = 'none';
-            tracks.forEach((name, i) => {
-                const div = document.createElement('div');
-                div.className = 'track-item';
-                div.textContent = name.replace(/\.[^.]+$/, '');
-                div.addEventListener('click', () => playTrack(i));
-                trackListEl.appendChild(div);
-            });
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/music`;
 
-            // Pre-load src + labels without playing
-            const name  = tracks[0];
-            audio.src   = `music/${name}`;
-            const label = name.replace(/\.[^.]+$/, '');
-            currentName.textContent = label;
-            toggleLabel.textContent = label;
-            currentIndex = 0;
-            document.querySelectorAll('.track-item').forEach((el, i) => {
-                el.classList.toggle('active', i === 0);
+        fetch(apiUrl)
+            .then(r => {
+                if (!r.ok) throw new Error('API error');
+                return r.json();
+            })
+            .then(files => {
+                tracks = files
+                    .filter(f => f.type === 'file' && /\.mp3$/i.test(f.name))
+                    .map(f => f.name);
+
+                if (tracks.length === 0) {
+                    noMusicMsg.textContent = 'no .mp3 files found in /music/';
+                    return;
+                }
+
+                noMusicMsg.style.display = 'none';
+                tracks.forEach((name, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'track-item';
+                    div.textContent = name.replace(/\.[^.]+$/, '');
+                    div.addEventListener('click', () => playTrack(i));
+                    trackListEl.appendChild(div);
+                });
+
+                // Pre-load first track without playing yet
+                const name  = tracks[0];
+                audio.src   = `music/${name}`;
+                const label = name.replace(/\.[^.]+$/, '');
+                currentName.textContent = label;
+                toggleLabel.textContent = label;
+                currentIndex = 0;
+                document.querySelectorAll('.track-item').forEach((el, i) => {
+                    el.classList.toggle('active', i === 0);
+                });
+                tracksLoaded = true;
+            })
+            .catch(() => {
+                noMusicMsg.textContent = 'could not load tracks';
             });
-            tracksLoaded = true;
-        })
-        .catch(() => {
-            noMusicMsg.innerHTML =
-                'add a <code style="color:#555">music/manifest.json</code><br>' +
-                'with a list of your .mp3 filenames';
-        });
+    })();
 
     // Dismiss splash on click — this user gesture lets audio play
     splashEl.addEventListener('click', () => {
