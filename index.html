@@ -517,6 +517,8 @@
     });
 
     // Load track list from manifest
+    let tracksReady = false;
+
     fetch('music/manifest.json')
         .then(r => {
             if (!r.ok) throw new Error('no manifest');
@@ -538,8 +540,35 @@
                 trackListEl.appendChild(div);
             });
 
-            // Auto-play first track (will wait for user gesture in most browsers)
-            playTrack(0);
+            // Pre-load the first track src so it's ready to go
+            const name = tracks[0];
+            audio.src = `music/${name}`;
+            const label = name.replace(/\.[^.]+$/, '');
+            currentName.textContent = label;
+            toggleLabel.textContent = label;
+            currentIndex = 0;
+            document.querySelectorAll('.track-item').forEach((el, i) => {
+                el.classList.toggle('active', i === 0);
+            });
+            tracksReady = true;
+
+            // Try autoplay immediately (works if browser allows it)
+            audio.play().then(() => {
+                btnPlay.textContent = '⏸';
+            }).catch(() => {
+                // Browser blocked it — wait for first interaction anywhere on page
+                const startOnInteraction = () => {
+                    audio.play().then(() => {
+                        btnPlay.textContent = '⏸';
+                    }).catch(() => {});
+                    document.removeEventListener('click', startOnInteraction);
+                    document.removeEventListener('keydown', startOnInteraction);
+                    document.removeEventListener('touchstart', startOnInteraction);
+                };
+                document.addEventListener('click', startOnInteraction);
+                document.addEventListener('keydown', startOnInteraction);
+                document.addEventListener('touchstart', startOnInteraction);
+            });
         })
         .catch(() => {
             noMusicMsg.innerHTML =
