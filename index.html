@@ -831,7 +831,8 @@
                 if (val === SECRET) {
                     feedback.textContent = '<evil>goog</evil> loading...';
                     feedback.className = 'right';
-                    setTimeout(() => { window.location.href = 'evil.html'; }, 600);
+                    document.addEventListener('evilUnlock', loadEvilInline, { once: true });
+                    setTimeout(() => document.dispatchEvent(new Event('evilUnlock')), 600);
                 } else {
                     feedback.textContent = '<error> 403: not goog enough </error>';
                     feedback.className = 'wrong';
@@ -846,6 +847,38 @@
                 box.classList.remove('open');
             }
         });
+
+        function loadEvilInline() {
+            fetch('evil.html')
+                .then(r => r.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Inject evil styles into head
+                    doc.querySelectorAll('style').forEach(s => {
+                        const styleTag = document.createElement('style');
+                        styleTag.textContent = s.textContent;
+                        document.head.appendChild(styleTag);
+                    });
+
+                    // Wipe everything except scripts
+                    document.querySelectorAll('body > *:not(script)').forEach(el => el.remove());
+
+                    // Create the goog div and dump evil.html body into it
+                    const goog = document.createElement('div');
+                    goog.id = 'goog';
+                    goog.innerHTML = doc.body.innerHTML;
+                    document.body.appendChild(goog);
+
+                    // Re-execute evil scripts (innerHTML won't run them)
+                    doc.querySelectorAll('script').forEach(s => {
+                        const script = document.createElement('script');
+                        script.textContent = s.textContent;
+                        document.body.appendChild(script);
+                    });
+                });
+        }
     })();
     </script>
 </body>
