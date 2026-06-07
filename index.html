@@ -865,9 +865,21 @@
                     // Wipe everything except scripts
                     document.querySelectorAll('body > *:not(script)').forEach(el => el.remove());
 
+                    // Override body styles for evil mode
+                    document.body.style.cssText = 'background:#0a0000;color:#882222;font-family:Courier New,monospace;margin:0;padding:0;';
+                    const scanlines = document.createElement('div');
+                    scanlines.style.cssText = 'position:fixed;inset:0;z-index:9998;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 2px,rgba(0,0,0,0.22) 2px,rgba(0,0,0,0.22) 4px);';
+                    document.body.appendChild(scanlines);
+
+                    // Vignette overlay (replaces body::after from evil.html)
+                    const vignette = document.createElement('div');
+                    vignette.style.cssText = 'position:fixed;inset:0;z-index:9997;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(100,0,0,0.25) 100%);';
+                    document.body.appendChild(vignette);
+
                     // Create the goog div and dump evil.html body into it
                     const goog = document.createElement('div');
                     goog.id = 'goog';
+                    goog.style.cssText = 'min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-x:hidden;';
                     goog.innerHTML = doc.body.innerHTML;
                     document.body.appendChild(goog);
 
