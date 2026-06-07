@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Evil Goog Company</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a0000">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0000;
+            color: #882222;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* ─── SCANLINES ─────────────────────────────────── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 2px,
+                rgba(0,0,0,0.22) 2px,
+                rgba(0,0,0,0.22) 4px
+            );
+        }
+
+        /* ─── RED GLOW VIGNETTE ─────────────────────────── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9997;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(100,0,0,0.25) 100%);
+        }
+
+        /* ─── TITLE ─────────────────────────────────────── */
+        #title {
+            font-size: clamp(4rem, 15vw, 10rem);
+            font-weight: 900;
+            color: #cc0000;
+            letter-spacing: -2px;
+            text-shadow:
+                0 0 20px rgba(200,0,0,0.6),
+                0 0 60px rgba(139,0,0,0.4),
+                0 0 120px rgba(100,0,0,0.2);
+            min-height: 1.2em;
+            display: flex;
+            align-items: center;
+            animation: evil-flicker 5s ease-in-out infinite;
+        }
+
+        @keyframes evil-flicker {
+            0%,100% { opacity: 1; text-shadow: 0 0 20px rgba(200,0,0,0.6), 0 0 60px rgba(139,0,0,0.4), 0 0 120px rgba(100,0,0,0.2); }
+            91%     { opacity: 1; }
+            92%     { opacity: 0.5; text-shadow: 0 0 4px rgba(200,0,0,0.4); }
+            93%     { opacity: 1; }
+            96%     { opacity: 0.8; }
+            97%     { opacity: 1; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 0.08em;
+            height: 1em;
+            background: #cc0000;
+            margin-left: 4px;
+            animation: blink 0.7s step-end infinite;
+            vertical-align: middle;
+            box-shadow: 0 0 8px #cc0000;
+        }
+
+        @keyframes blink {
+            0%,100% { opacity: 1; }
+            50%     { opacity: 0; }
+        }
+
+        /* ─── TAGLINE ────────────────────────────────────── */
+        #tagline {
+            margin-top: 2rem;
+            font-size: 1rem;
+            color: #4a0000;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        #tagline.visible { opacity: 1; }
+
+        /* ─── ASCII ──────────────────────────────────────── */
+        #ascii-wrapper {
+            margin-top: 3rem;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            width: 100%;
+            max-width: 1400px;
+            padding: 0 1rem;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        #ascii-wrapper.visible { opacity: 1; }
+
+        #ascii {
+            font-size: clamp(5px, 1.4vw, 11px);
+            line-height: 1.1;
+            /* red tint via CSS filter on the pre — color stays as-is from txt */
+            color: #7a0000;
+            white-space: pre;
+            overflow: hidden;
+            display: block;
+            font-family: 'Courier New', monospace;
+            margin: 0 auto;
+            text-shadow: 0 0 6px rgba(180,0,0,0.3);
+            animation: ascii-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes ascii-pulse {
+            0%,100% { color: #7a0000; text-shadow: 0 0 6px rgba(180,0,0,0.3); }
+            50%     { color: #9a1111; text-shadow: 0 0 12px rgba(200,0,0,0.5); }
+        }
+
+        /* ─── FOOTER ─────────────────────────────────────── */
+        #footer {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+
+        #footer.visible { opacity: 1; }
+
+        #counter-label {
+            font-size: 1rem;
+            color: #4a0000;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        #profiles {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.1rem;
+            border: 1px solid #3a0000;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #661111;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+
+        .profile-badge:hover {
+            border-color: #cc0000;
+            color: #ff4444;
+            box-shadow: 0 0 14px rgba(180,0,0,0.35);
+        }
+
+        .profile-badge svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* evil label under badges */
+        .profile-badge .evil-tag {
+            font-size: 0.6rem;
+            color: #3a0000;
+            letter-spacing: 0.15em;
+        }
+
+        /* ─── BACK LINK ──────────────────────────────────── */
+        #escape {
+            margin-top: 0.5rem;
+            font-size: 0.68rem;
+            color: #2a0000;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 1px solid #2a0000;
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        #escape:hover {
+            border-color: #550000;
+            color: #880000;
+        }
+
+        /* ─── SIGIL ──────────────────────────────────────── */
+        #sigil {
+            font-size: 2.8rem;
+            color: #3a0000;
+            display: inline-block;
+            animation: spin-slow 20s linear infinite;
+            text-shadow: 0 0 18px rgba(180,0,0,0.5);
+            line-height: 1;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        /* ─── SCROLLBAR ──────────────────────────────────── */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0a0000; }
+        ::-webkit-scrollbar-thumb { background: #550000; border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+    <!-- ── TITLE ─────────────────────────────────────────── -->
+    <div id="title"><span id="typed"></span><span class="cursor"></span></div>
+
+    <!-- ── TAGLINE ───────────────────────────────────────── -->
+    <div id="tagline">the evil goog company</div>
+
+    <!-- ── ASCII ─────────────────────────────────────────── -->
+    <div id="ascii-wrapper">
+        <pre id="ascii"></pre>
+    </div>
+
+    <!-- ── FOOTER ────────────────────────────────────────── -->
+    <div id="footer">
+        <div id="counter-label">evil goog visits</div>
+
+        <span id="sigil">✦</span>
+
+        <div id="profiles">
+            <a class="profile-badge" href="https://github.com/goog-company" target="_blank">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+                evil-goog-company
+            </a>
+            <a class="profile-badge" href="https://github.com/unfooled" target="_blank">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+                evil-unfooled
+            </a>
+            <a class="profile-badge" href="https://github.com/ml3czus" target="_blank">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+                evil-ml3czus
+            </a>
+        </div>
+
+        <a href="index.html" id="escape">← escape the evil</a>
+    </div>
+
+    <script>
+    /* ════════════════════════════════════════════════════
+       TYPING ANIMATION — "Evil Goog" instead of "Goog"
+       ════════════════════════════════════════════════════ */
+    const word    = "Evil Goog";
+    let i         = 0;
+    const typedEl = document.getElementById('typed');
+    const tagline = document.getElementById('tagline');
+    const asciiWrapper = document.getElementById('ascii-wrapper');
+    const asciiEl      = document.getElementById('ascii');
+    const footer       = document.getElementById('footer');
+
+    function showAscii() {
+        fetch('ascii-art.txt')
+            .then(r => r.text())
+            .then(text => {
+                asciiEl.textContent = text;
+                asciiWrapper.classList.add('visible');
+                setTimeout(() => footer.classList.add('visible'), 800);
+            })
+            .catch(() => {
+                // If ascii-art.txt can't load, still show footer
+                asciiWrapper.style.display = 'none';
+                footer.classList.add('visible');
+            });
+    }
+
+    function typeNext() {
+        if (i <= word.length) {
+            typedEl.textContent = word.slice(0, i);
+            i++;
+            const delay = i === 1 ? 400 : 120 + Math.random() * 80;
+            setTimeout(typeNext, delay);
+        } else {
+            setTimeout(() => {
+                tagline.classList.add('visible');
+                showAscii();
+            }, 600);
+        }
+    }
+
+    setTimeout(typeNext, 800);
+    </script>
+</body>
+</html>
