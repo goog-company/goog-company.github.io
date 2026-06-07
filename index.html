@@ -32,7 +32,6 @@
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
-            /* cursor will be set via JS if custom cursor is found */
         }
 
         /* ─── SPLASH SCREEN ─────────────────────────────────────── */
@@ -99,7 +98,7 @@
             left: 0;
             pointer-events: none;
             z-index: 99999;
-            display: none; /* shown only when a cursor image loads */
+            display: none;
             transform: translate(-50%, -50%);
             width: 32px;
             height: 32px;
@@ -172,11 +171,8 @@
             backdrop-filter: blur(8px);
         }
 
-        #player-panel.open {
-            display: flex;
-        }
+        #player-panel.open { display: flex; }
 
-        /* play/pause + track name row */
         #player-controls {
             display: flex;
             align-items: center;
@@ -214,7 +210,6 @@
             flex: 1;
         }
 
-        /* volume row */
         #volume-row {
             display: flex;
             align-items: center;
@@ -251,9 +246,7 @@
             transition: background 0.2s;
         }
 
-        #volume-slider::-webkit-slider-thumb:hover {
-            background: #ccc;
-        }
+        #volume-slider::-webkit-slider-thumb:hover { background: #ccc; }
 
         #volume-slider::-moz-range-thumb {
             width: 10px;
@@ -264,7 +257,6 @@
             border: none;
         }
 
-        /* track list */
         #track-list {
             display: flex;
             flex-direction: column;
@@ -273,18 +265,9 @@
             overflow-y: auto;
         }
 
-        #track-list::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        #track-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #track-list::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 2px;
-        }
+        #track-list::-webkit-scrollbar { width: 3px; }
+        #track-list::-webkit-scrollbar-track { background: transparent; }
+        #track-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
         .track-item {
             font-size: 0.7rem;
@@ -318,7 +301,7 @@
             text-align: center;
         }
 
-        /* ─── MAIN CONTENT (unchanged) ─────────────────────────── */
+        /* ─── MAIN CONTENT ──────────────────────────────────────── */
         #title {
             font-size: clamp(4rem, 15vw, 10rem);
             font-weight: 900;
@@ -382,6 +365,7 @@
             margin: 0 auto;
         }
 
+        /* ─── FOOTER ────────────────────────────────────────────── */
         #footer {
             margin-top: 3rem;
             margin-bottom: 3rem;
@@ -394,6 +378,21 @@
         }
 
         #footer.visible { opacity: 1; }
+
+        /* ─── SPINNING SIGIL ────────────────────────────────────── */
+        #sigil {
+            font-size: 2.8rem;
+            color: #1e1e1e;
+            display: inline-block;
+            animation: spin-slow 20s linear infinite;
+            text-shadow: 0 0 12px rgba(255,255,255,0.04);
+            line-height: 1;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
 
         #counter-label {
             font-size: 1rem;
@@ -432,6 +431,93 @@
             width: 18px;
             height: 18px;
             fill: currentColor;
+        }
+
+        /* ─── EVIL PORTAL ───────────────────────────────────────── */
+        #evil-portal {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.4rem;
+        }
+
+        #evil-portal-label {
+            font-size: 0.65rem;
+            color: #1e1e1e;
+            letter-spacing: 0.2em;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            padding: 0.3rem 0.5rem;
+            border: 1px solid #1a1a1a;
+            border-radius: 3px;
+            transition: color 0.3s, border-color 0.3s;
+            user-select: none;
+        }
+
+        #evil-portal-label:hover {
+            color: #440000;
+            border-color: #440000;
+        }
+
+        #evil-portal-box {
+            background: rgba(8, 0, 0, 0.92);
+            border: 1px solid #2a0000;
+            border-radius: 5px;
+            padding: 0.8rem 1rem;
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 200px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 30px rgba(100,0,0,0.3);
+        }
+
+        #evil-portal-box.open { display: flex; }
+
+        #evil-portal-hint {
+            font-size: 0.6rem;
+            color: #3a0000;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            font-family: 'Courier New', monospace;
+        }
+
+        #evil-input {
+            background: none;
+            border: none;
+            border-bottom: 1px solid #3a0000;
+            color: #880000;
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.25em;
+            outline: none;
+            padding: 0.3rem 0;
+            width: 100%;
+            caret-color: #cc0000;
+        }
+
+        #evil-input::placeholder { color: #200000; }
+
+        #evil-feedback {
+            font-size: 0.6rem;
+            color: #4a0000;
+            letter-spacing: 0.15em;
+            font-family: 'Courier New', monospace;
+            min-height: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        #evil-feedback.wrong { color: #440000; animation: shake 0.3s ease; }
+        #evil-feedback.right { color: #cc0000; }
+
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25%     { transform: translateX(-4px); }
+            75%     { transform: translateX(4px); }
         }
     </style>
 </head>
@@ -478,6 +564,7 @@
     </div>
 
     <div id="footer">
+        <span id="sigil">✦</span>
         <div id="counter-label">goog visits</div>
         <img src="https://count.getloli.com/@goog-website?name=goog-website&theme=booru-lewd" alt="goog visits" />
 
@@ -497,11 +584,19 @@
         </div>
     </div>
 
+    <!-- ── EVIL PORTAL ────────────────────────────────── -->
+    <div id="evil-portal">
+        <div id="evil-portal-label">?</div>
+        <div id="evil-portal-box">
+            <span id="evil-portal-hint">enter the code</span>
+            <input id="evil-input" type="text" maxlength="40" autocomplete="off" spellcheck="false" placeholder="_ _ _ _ _ _ _ _">
+            <div id="evil-feedback"></div>
+        </div>
+    </div>
+
     <script>
     /* ════════════════════════════════════════════════════
        CUSTOM CURSOR
-       Reads optional cursor_file from config.json, then
-       falls back to trying common names + extensions.
        ════════════════════════════════════════════════════ */
     (function initCursor() {
         const cursorEl  = document.getElementById('custom-cursor');
@@ -509,8 +604,6 @@
 
         const exts   = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'svg', 'cur'];
         const names  = ['cursor', 'Cursor', 'mouse', 'pointer'];
-
-        // Build full candidate list: every name × every ext
         const candidates = [];
         names.forEach(n => exts.forEach(e => candidates.push(`cursor/${n}.${e}`)));
 
@@ -530,24 +623,19 @@
         }
 
         async function findCursor(overridePath) {
-            // If config gave us a specific filename, try that first
             if (overridePath) {
                 try { return applyCursor(await tryPath(overridePath)); } catch(_) {}
             }
-            // Otherwise scan all candidates
             for (const c of candidates) {
                 try { return applyCursor(await tryPath(c)); } catch(_) {}
             }
-            // Nothing found — keep default browser cursor
         }
 
-        // config.json may specify cursor_file e.g. "cursor/myCursor.png"
         fetch('config.json')
             .then(r => r.ok ? r.json() : {})
             .then(cfg => findCursor(cfg.cursor_file))
             .catch(() => findCursor(null));
 
-        // Follow mouse precisely
         document.addEventListener('mousemove', e => {
             cursorEl.style.left = e.clientX + 'px';
             cursorEl.style.top  = e.clientY + 'px';
@@ -555,14 +643,13 @@
     })();
 
     /* ════════════════════════════════════════════════════
-       SPLASH SCREEN — loads text from config.json
+       SPLASH SCREEN
        ════════════════════════════════════════════════════ */
     const splashEl  = document.getElementById('splash');
     const splashMsg = document.getElementById('splash-message');
     const splashSub = document.getElementById('splash-sub');
     const splashKey = document.getElementById('splash-key');
 
-    // Load config.json and apply splash text
     fetch('config.json')
         .then(r => r.ok ? r.json() : {})
         .then(cfg => {
@@ -570,7 +657,7 @@
             if (cfg.splash_sub)     splashSub.textContent = cfg.splash_sub;
             if (cfg.splash_key)     splashKey.textContent = cfg.splash_key;
         })
-        .catch(() => {}); // silently keep defaults if config missing
+        .catch(() => {});
 
     /* ════════════════════════════════════════════════════
        MUSIC PLAYER
@@ -612,16 +699,13 @@
     function playTrack(index) {
         if (index < 0 || index >= tracks.length) return;
         currentIndex = index;
-
         const name = tracks[index];
         audio.src  = `music/${name}`;
         audio.play().catch(() => {});
         btnPlay.textContent = '⏸';
-
         const label = name.replace(/\.[^.]+$/, '');
         currentName.textContent = label;
         toggleLabel.textContent = label;
-
         document.querySelectorAll('.track-item').forEach((el, i) => {
             el.classList.toggle('active', i === index);
         });
@@ -632,16 +716,11 @@
         playTrack(next);
     });
 
-    // Auto-detect mp3s via GitHub API — no manifest needed
-    // Reads repo/owner from the current page URL (works for github.io sites)
     (function loadTracks() {
-        // Extract "owner" and "repo" from the github.io hostname + path
-        // e.g. goog-company.github.io → owner=goog-company, repo=goog-company.github.io
-        const host  = location.hostname; // e.g. "goog-company.github.io"
+        const host  = location.hostname;
         const parts = host.split('.');
         const owner = parts[0];
-        const repo  = host; // github.io repo name matches the full hostname
-
+        const repo  = host;
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/music`;
 
         fetch(apiUrl)
@@ -668,7 +747,6 @@
                     trackListEl.appendChild(div);
                 });
 
-                // Pre-load first track without playing yet
                 const name  = tracks[0];
                 audio.src   = `music/${name}`;
                 const label = name.replace(/\.[^.]+$/, '');
@@ -685,11 +763,9 @@
             });
     })();
 
-    // Dismiss splash on click — this user gesture lets audio play
     splashEl.addEventListener('click', () => {
         splashEl.classList.add('hiding');
         setTimeout(() => splashEl.remove(), 700);
-
         if (tracksLoaded) {
             audio.play().then(() => {
                 btnPlay.textContent = '⏸';
@@ -698,15 +774,15 @@
     });
 
     /* ════════════════════════════════════════════════════
-       ORIGINAL TYPING + ASCII LOGIC (unchanged)
+       TYPING + ASCII
        ════════════════════════════════════════════════════ */
-    const word      = "Goog";
-    let i           = 0;
-    const typedEl   = document.getElementById('typed');
-    const tagline   = document.getElementById('tagline');
+    const word         = "Goog";
+    let i              = 0;
+    const typedEl      = document.getElementById('typed');
+    const tagline      = document.getElementById('tagline');
     const asciiWrapper = document.getElementById('ascii-wrapper');
-    const asciiEl   = document.getElementById('ascii');
-    const footer    = document.getElementById('footer');
+    const asciiEl      = document.getElementById('ascii');
+    const footer       = document.getElementById('footer');
 
     function showAscii() {
         fetch('ascii-art.txt')
@@ -733,6 +809,44 @@
     }
 
     setTimeout(typeNext, 800);
+
+    /* ════════════════════════════════════════════════════
+       EVIL PORTAL
+       ════════════════════════════════════════════════════ */
+    (function() {
+        const label    = document.getElementById('evil-portal-label');
+        const box      = document.getElementById('evil-portal-box');
+        const input    = document.getElementById('evil-input');
+        const feedback = document.getElementById('evil-feedback');
+        const SECRET   = 'evil goog';
+
+        label.addEventListener('click', () => {
+            box.classList.toggle('open');
+            if (box.classList.contains('open')) input.focus();
+        });
+
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                const val = input.value.trim().toLowerCase();
+                if (val === SECRET) {
+                    feedback.textContent = 'entering...';
+                    feedback.className = 'right';
+                    setTimeout(() => { window.location.href = 'evil.html'; }, 600);
+                } else {
+                    feedback.textContent = 'incorrect.';
+                    feedback.className = 'wrong';
+                    input.value = '';
+                    setTimeout(() => { feedback.textContent = ''; feedback.className = ''; }, 1500);
+                }
+            }
+        });
+
+        document.addEventListener('click', e => {
+            if (!document.getElementById('evil-portal').contains(e.target)) {
+                box.classList.remove('open');
+            }
+        });
+    })();
     </script>
 </body>
 </html>
