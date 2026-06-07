@@ -279,7 +279,7 @@
        TYPING ANIMATION — "Evil Goog" instead of "Goog"
        ════════════════════════════════════════════════════ */
     const word    = "Evil Goog";
-    let i         = 0;
+    let _ei        = 0;
     const typedEl = document.getElementById('typed');
     const tagline = document.getElementById('tagline');
     const asciiWrapper = document.getElementById('ascii-wrapper');
@@ -302,10 +302,10 @@
     }
 
     function typeNext() {
-        if (i <= word.length) {
-            typedEl.textContent = word.slice(0, i);
-            i++;
-            const delay = i === 1 ? 400 : 120 + Math.random() * 80;
+        if (_ei <= word.length) {
+            typedEl.textContent = word.slice(0, _ei);
+            _ei++;
+            const delay = _ei === 1 ? 400 : 120 + Math.random() * 80;
             setTimeout(typeNext, delay);
         } else {
             setTimeout(() => {
