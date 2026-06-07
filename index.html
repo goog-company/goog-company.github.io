@@ -588,8 +588,8 @@
     <div id="evil-portal">
         <div id="evil-portal-label">?</div>
         <div id="evil-portal-box">
-            <span id="evil-portal-hint">enter the code</span>
-            <input id="evil-input" type="text" maxlength="40" autocomplete="off" spellcheck="false" placeholder="_ _ _ _ _ _ _ _">
+            <span id="evil-portal-hint"><input type="password" /></span>
+            <input id="evil-input" type="text" maxlength="40" autocomplete="off" spellcheck="false" placeholder="</?...>">
             <div id="evil-feedback"></div>
         </div>
     </div>
@@ -818,7 +818,7 @@
         const box      = document.getElementById('evil-portal-box');
         const input    = document.getElementById('evil-input');
         const feedback = document.getElementById('evil-feedback');
-        const SECRET   = 'evil goog';
+        const SECRET   = '<evil>goog</evil>';
 
         label.addEventListener('click', () => {
             box.classList.toggle('open');
@@ -829,11 +829,11 @@
             if (e.key === 'Enter') {
                 const val = input.value.trim().toLowerCase();
                 if (val === SECRET) {
-                    feedback.textContent = 'entering...';
+                    feedback.textContent = '<evil>goog</evil> loading...';
                     feedback.className = 'right';
                     setTimeout(() => { window.location.href = 'evil.html'; }, 600);
                 } else {
-                    feedback.textContent = 'incorrect.';
+                    feedback.textContent = '<error> 403: not goog enough </error>';
                     feedback.className = 'wrong';
                     input.value = '';
                     setTimeout(() => { feedback.textContent = ''; feedback.className = ''; }, 1500);
