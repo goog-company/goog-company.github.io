@@ -855,10 +855,11 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
-                    // Inject evil styles into head
+                    // Inject evil styles, remapping `body` selectors to `#goog`
                     doc.querySelectorAll('style').forEach(s => {
                         const styleTag = document.createElement('style');
-                        styleTag.textContent = s.textContent;
+                        styleTag.textContent = s.textContent
+                            .replace(/\bbody\b/g, '#goog');
                         document.head.appendChild(styleTag);
                     });
 
